@@ -1,0 +1,2686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉语普通话语音常识</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding-bottom: 300px;
+            background-color: #f7fbf3;
+        }
+        #gameContainer {
+            display: block;
+            min-height: calc(100vh - 150px);
+        }
+        #infoBox { 
+            width: 95%; 
+            max-width: 700px;
+            min-height: 100px; 
+            margin: 0 auto; 
+            border: 2px solid #feeec9;
+            background: #fede94;
+            color: #5b5b5b; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(40px, 5vw, 60px);
+            font-weight: bold;
+        }
+        #contactBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 2px solid #feeec9; 
+            background: #fede94; 
+            color: #6b6b6b; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #instructionBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 2px solid #feeec9; 
+            background: #fede94; 
+            color: #6b6b6b; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #controls { 
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 800px;
+            background: #f7fbf3;
+            border: 3px solid #f7fbf3;                        
+            padding: 10px 0; 
+            z-index: 1000; 
+        }
+        #controls div {
+            margin: 5px 0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        button { 
+            padding: 8px 8px; 
+            margin: 0 5px; 
+            cursor: pointer; 
+            border: 2px solid #fede94; 
+            background: #fede94;
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+            color: #5b5b5b; 
+            font-size: 28px; 
+            border-radius: 5px; 
+        }
+        #sentenceNumber { 
+            width: 50px; 
+            padding: 10px; 
+            text-align: center; 
+            border: 3px solid #fede94;
+            background: #f8e5ba; 
+            color: #000; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            -moz-appearance: textfield; 
+        }
+        #sentenceNumber::-webkit-inner-spin-button, 
+        #sentenceNumber::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        #sentenceNumber:disabled { 
+            background: #eee; 
+        }
+        .disabled { 
+            cursor: not-allowed; 
+            pointer-events: none; 
+        }
+        .active-mode { 
+            border: 3px solid #b6d7a8; 
+        }
+        #indicator { 
+            width: 95%;
+            max-width: 700px; 
+            min-height: 50px; 
+            margin: 10px auto;
+            padding: 5px;
+            border: 3px solid #fed16a; 
+            background: #ffffe0; 
+            border-radius: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #noteDisplay {
+            width: 95%;
+            max-width: 700px;
+            margin: 5px auto;
+            padding: 8px;
+            border: 2px solid #ff0000;
+            background: #ffeaea;
+            color: #ff0000;
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: left;
+            display: none;
+        }
+        #optionsContainer {
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto;
+        }
+        .optionBtn {
+            width: 95%; 
+            max-width: 700px;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #ffffff;
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 30px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .optionBtn:hover {
+            background: #D2E4C4;
+        }
+        .correct {
+            background: #B7D7AA !important;
+        }
+        .wrong {
+            background: #CE6D5E !important;
+        }
+        #score { 
+            display: none; 
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto; 
+            color: #FF6820; 
+            font-size: 30px; 
+            text-align: center;
+        }
+        #wrongSentences { 
+            display: none; 
+            width: 95%; 
+            max-width: 700px; 
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #CE6D5E; 
+            background: #FFF0F0; 
+            color: #CE6D5E; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+        }
+        #results { 
+            display: none; 
+            width: 95%;
+            max-width: 700px;        
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #734A2E; 
+            background: #fffbef; 
+            color: #000; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+            white-space: pre-line;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 200px;
+            }
+            #controls {
+                padding: 5px 0;
+            }
+            button {
+                padding: 6px 6px;
+                font-size: 20px;
+            }
+            #sentenceNumber {
+                width: 40px;
+                padding: 8px;
+                font-size: 14px;
+            }
+            .optionBtn {
+                font-size: 25px;
+                padding: 8px;
+            }
+            #infoBox {
+                font-size: clamp(30px, 4vw, 40px);
+            }
+            #contactBox, #instructionBox {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+            #indicator {
+                min-height: 40px;
+            }
+            #noteDisplay {
+                font-size: 16px;
+                padding: 6px;
+            }
+            #results, #wrongSentences, #score {
+                font-size: 24px;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="infoBox">汉语普通话<br>语音常识</div>
+        <div id="contactBox">讲师-阮玉煌 | Weixin：XiDeYueNanYu</div>
+        <div id="instructionBox">辅助学习越南语资料</div>
+        <div id="indicator"></div>
+        <div id="noteDisplay"></div>
+        <div id="optionsContainer"></div>
+        <div id="results"></div>
+        <div id="score">0/0</div>
+        <div id="wrongSentences"></div>
+    </div>
+    <div id="controls">
+        <div>
+            <button id="freeModeBtn" class="active-mode">自由模式</button>
+            <button id="testModeBtn">作业模式</button>
+        </div>
+        <div>
+            <button id="autoContinueBtn">自动继续</button>
+            <button id="showHideBtn">显示-隐藏</button>
+        </div>
+        <div>
+            <button id="prevBtn">◀</button>
+            <input type="text" id="sentenceNumber" inputmode="numeric" pattern="[0-9]*">
+            <button id="nextBtn">▶</button>
+            <button id="replayBtn">再听一遍</button>
+        </div>
+    </div>
+    <audio id="mainAudio" src="audio.mp3"></audio>
+    <audio id="correctAudio" src="Dung.mp3"></audio>
+    <audio id="wrongAudio" src="Sai.mp3"></audio>
+
+    <script>
+        const audio = document.getElementById('mainAudio');
+        const correctAudio = document.getElementById('correctAudio');
+        const wrongAudio = document.getElementById('wrongAudio');
+        const indicator = document.getElementById('indicator');
+        const noteDisplay = document.getElementById('noteDisplay');
+        const sentenceNumber = document.getElementById('sentenceNumber');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const replayBtn = document.getElementById('replayBtn');
+        const freeModeBtn = document.getElementById('freeModeBtn');
+        const testModeBtn = document.getElementById('testModeBtn');
+        const autoContinueBtn = document.getElementById('autoContinueBtn');
+        const showHideBtn = document.getElementById('showHideBtn');
+        const scoreDisplay = document.getElementById('score');
+        const wrongSentencesDisplay = document.getElementById('wrongSentences');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const resultsDisplay = document.getElementById('results');
+
+        const buttons = [prevBtn, nextBtn, replayBtn, freeModeBtn, testModeBtn, autoContinueBtn, showHideBtn];
+
+const sentences = [
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I usually have breakfast at 7 a.m.",
+        "note": "dùng hiện tại tiếp diễn hoặc hiện tại hoàn thành cho thói quen.",
+        "translation": "我通常在早上七点吃早餐。",
+        "options": [
+            "I usually am having breakfast at 7 a.m.",
+            "I usually have breakfast at 7 a.m.",
+            "I usually have had breakfast at 7 a.m.",
+            "I usually will have breakfast at 7 a.m."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is going to school at the moment.",
+        "note": "dùng hiện tại đơn hoặc chia sai dạng tiếp diễn cho hành động đang diễn ra.",
+        "translation": "她现在正在去学校。",
+        "options": [
+            "She goes to school at the moment.",
+            "She is going to school at the moment.",
+            "She has gone to school at the moment.",
+            "She is go to school at the moment."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has worked in this company since 2020.",
+        "note": "dùng hiện tại đơn hoặc hiện tại tiếp diễn với khoảng thời gian kéo dài.",
+        "translation": "他自2020年以来一直在这家公司工作。",
+        "options": [
+            "He works in this company since 2020.",
+            "He has worked in this company since 2020.",
+            "He is working in this company since 2020.",
+            "He has been work in this company since 2020."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The birds are singing beautifully.",
+        "note": "dùng hiện tại đơn cho hành động xảy ra ngay lúc nói.",
+        "translation": "鸟儿正在美妙地歌唱。",
+        "options": [
+            "The birds sing beautifully.",
+            "The birds sings beautifully.",
+            "The birds are singing beautifully.",
+            "The birds have sung beautifully."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have known you for a long time.",
+        "note": "dùng thì tiếp diễn với động từ không ở dạng tiếp diễn.",
+        "translation": "我认识你很久了。",
+        "options": [
+            "I know you for a long time.",
+            "I have been knowing you for a long time.",
+            "I have known you for a long time.",
+            "I am knowing you for a long time."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She does her homework every evening.",
+        "note": "dùng thì tiếp diễn hoặc hoàn thành cho thói quen cố định.",
+        "translation": "她每天晚上都做作业。",
+        "options": [
+            "She is doing her homework every evening.",
+            "She does her homework every evening.",
+            "She has done her homework every evening.",
+            "She has been doing her homework every evening."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They have been trying to finish the report for two hours.",
+        "note": "nhầm lẫn giữa hoàn thành và hoàn thành tiếp diễn khi mô tả hành động kéo dài.",
+        "translation": "他们已经尝试完成这份报告两个小时了。",
+        "options": [
+            "They try to finish the report for two hours.",
+            "They are trying to finish the report for two hours.",
+            "They have tried to finish the report for two hours.",
+            "They have been trying to finish the report for two hours."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My parents live in this house.",
+        "note": "dùng thì tiếp diễn hoặc hoàn thành cho tình trạng ổn định.",
+        "translation": "我的父母住在这所房子里。",
+        "options": [
+            "My parents are living in this house.",
+            "My parents live in this house.",
+            "My parents have lived in this house.",
+            "My parents have been living in this house."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The baby is sleeping.",
+        "note": "dùng hiện tại đơn cho hành động đang diễn ra.",
+        "translation": "宝宝正在睡觉。",
+        "options": [
+            "The baby sleeps.",
+            "The baby is sleeping.",
+            "The baby has slept.",
+            "The baby sleep."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has read three books this year.",
+        "note": "dùng hiện tại đơn hoặc quá khứ đơn với mốc thời gian chưa kết thúc.",
+        "translation": "她今年已经读了三本书。",
+        "options": [
+            "She reads three books this year.",
+            "She is reading three books this year.",
+            "She read three books this year.",
+            "She has read three books this year."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am looking for my keys right now.",
+        "note": "dùng hiện tại đơn hoặc chia sai dạng tiếp diễn cho hành động ngay lúc nói.",
+        "translation": "我现在正在找我的钥匙。",
+        "options": [
+            "I look for my keys right now.",
+            "I am looking for my keys right now.",
+            "I have looked for my keys right now.",
+            "I have been look for my keys right now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She drinks coffee every morning.",
+        "note": "dùng thì tiếp diễn hoặc hoàn thành cho thói quen.",
+        "translation": "她每天早上都喝咖啡。",
+        "options": [
+            "She is drinking coffee every morning.",
+            "She drinks coffee every morning.",
+            "She has drunk coffee every morning.",
+            "She has been drinking coffee every morning."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They are building a new bridge this month.",
+        "note": "dùng hiện tại đơn hoặc chia sai dạng tiếp diễn cho kế hoạch đang diễn ra.",
+        "translation": "他们这个月正在建一座新桥。",
+        "options": [
+            "They build a new bridge this month.",
+            "They are build a new bridge this month.",
+            "They are building a new bridge this month.",
+            "They have built a new bridge this month."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have lived here for ten years.",
+        "note": "dùng hiện tại đơn hoặc tiếp diễn cho tình trạng kéo dài.",
+        "translation": "我在这里住了十年。",
+        "options": [
+            "I live here for ten years.",
+            "I have lived here for ten years.",
+            "I am living here for ten years.",
+            "I have been live here for ten years."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He is always forgetting his wallet.",
+        "note": "không nắm được cách dùng “always + V-ing” để diễn tả sự phàn nàn.",
+        "translation": "他老是忘记带钱包。",
+        "options": [
+            "He always forgets his wallet.",
+            "He is always forgetting his wallet.",
+            "He has always forgotten his wallet.",
+            "He will always forget his wallet."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has been studying English all morning.",
+        "note": "nhầm giữa hoàn thành và hoàn thành tiếp diễn cho hành động kéo dài.",
+        "translation": "她整个上午都在学习英语。",
+        "options": [
+            "She studies English all morning.",
+            "She is studying English all morning.",
+            "She has studied English all morning.",
+            "She has been studying English all morning."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The sun rises in the east.",
+        "note": "dùng các thì khác cho chân lý phổ quát.",
+        "translation": "太阳从东方升起。",
+        "options": [
+            "The sun is rising in the east.",
+            "The sun rises in the east.",
+            "The sun has risen in the east.",
+            "The sun has been rising in the east."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "Are you listening to me?",
+        "note": "dùng hiện tại đơn thay cho hành động đang diễn ra.",
+        "translation": "你在听我说话吗？",
+        "options": [
+            "Do you listen to me?",
+            "Are you listening to me?",
+            "Have you listened to me?",
+            "Have you been listening me?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has already finished his homework.",
+        "note": "dùng hiện tại đơn cho hành động đã hoàn thành.",
+        "translation": "他已经完成了作业。",
+        "options": [
+            "He already finishes his homework.",
+            "He is already finishing his homework.",
+            "He has already finished his homework.",
+            "He has been already finish his homework."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "We are planning a trip this weekend.",
+        "note": "nhầm giữa kế hoạch tạm thời (tiếp diễn) và kế hoạch cố định.",
+        "translation": "我们正在计划这个周末的旅行。",
+        "options": [
+            "We plan a trip this weekend.",
+            "We are plan a trip this weekend.",
+            "We are planning a trip this weekend.",
+            "We have planned a trip this weekend."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She often helps her mother cook dinner.",
+        "note": "dùng tiếp diễn cho thói quen.",
+        "translation": "她常常帮助母亲做晚饭。",
+        "options": [
+            "She is often helping her mother cook dinner.",
+            "She often helps her mother cook dinner.",
+            "She has often helped her mother cook dinner.",
+            "She has been often helping her mother cook dinner."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am reading a really interesting book these days.",
+        "note": "nhầm dùng hiện tại đơn cho tình huống tạm thời.",
+        "translation": "这些天我正在读一本非常有趣的书。",
+        "options": [
+            "I read a really interesting book these days.",
+            "I am reading a really interesting book these days.",
+            "I have read a really interesting book these days.",
+            "I have been read a really interesting book these days."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They have visited Japan several times.",
+        "note": "dùng hiện tại đơn thay cho kinh nghiệm sống.",
+        "translation": "他们去过日本好几次。",
+        "options": [
+            "They visit Japan several times.",
+            "They are visiting Japan several times.",
+            "They have visited Japan several times.",
+            "They have been visiting Japan several times."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He is not working today.",
+        "note": "dùng hiện tại đơn cho lịch trình thay đổi tạm thời.",
+        "translation": "他今天没上班。",
+        "options": [
+            "He does not work today.",
+            "He is not working today.",
+            "He has not worked today.",
+            "He has not been working today."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My brother has been fixing his bike all afternoon.",
+        "note": "nhầm giữa hoàn thành và hoàn thành tiếp diễn cho hành động kéo dài.",
+        "translation": "我弟弟整个下午都在修他的自行车。",
+        "options": [
+            "My brother fixes his bike all afternoon.",
+            "My brother is fixing his bike all afternoon.",
+            "My brother has fixed his bike all afternoon.",
+            "My brother has been fixing his bike all afternoon."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The train leaves at 6 p.m.",
+        "note": "không nắm được việc dùng hiện tại đơn cho thời gian biểu cố định.",
+        "translation": "火车下午六点出发。",
+        "options": [
+            "The train is leaving at 6 p.m.",
+            "The train leave at 6 p.m.",
+            "The train leaves at 6 p.m.",
+            "The train has left at 6 p.m."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I don’t understand what you mean.",
+        "note": "dùng tiếp diễn cho động từ nhận thức.",
+        "translation": "我不明白你的意思。",
+        "options": [
+            "I am not understanding what you mean.",
+            "I am understand what you mean.",
+            "I don’t understand what you mean.",
+            "I haven’t understood what you mean."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is staying with her aunt this week.",
+        "note": "dùng hiện tại đơn thay cho tình huống tạm thời.",
+        "translation": "她这周暂住在姑妈家。",
+        "options": [
+            "She stays with her aunt this week.",
+            "She is staying with her aunt this week.",
+            "She has stayed with her aunt this week.",
+            "She has been stay with her aunt this week."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have just finished my lunch.",
+        "note": "dùng hiện tại đơn hoặc tiếp diễn cho hành động vừa mới xảy ra.",
+        "translation": "我刚吃完午饭。",
+        "options": [
+            "I just finish my lunch.",
+            "I am just finishing my lunch.",
+            "I have just finished my lunch.",
+            "I have been just finish my lunch."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They are not listening to the teacher.",
+        "note": "dùng hiện tại đơn thay cho hành động đang diễn ra.",
+        "translation": "他们没有在听老师讲课。",
+        "options": [
+            "They do not listen to the teacher.",
+            "They are not listening to the teacher.",
+            "They have not listened to the teacher.",
+            "They have been not listening to the teacher."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has never seen snow before.",
+        "note": "nhầm giữa kinh nghiệm (present perfect) và hiện tại đơn.",
+        "translation": "她以前从来没有见过雪。",
+        "options": [
+            "She never sees snow before.",
+            "She is never seeing snow before.",
+            "She has never seen snow before.",
+            "She has been never seeing snow before."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am getting tired of this noise.",
+        "note": "không dùng tiếp diễn cho sự thay đổi dần dần.",
+        "translation": "我越来越厌倦这种噪音了。",
+        "options": [
+            "I get tired of this noise.",
+            "I am getting tired of this noise.",
+            "I have got tired of this noise.",
+            "I have been get tired of this noise."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has worked here since 2015.",
+        "note": "sai cách dùng since với thì hoàn thành.",
+        "translation": "他从2015年起就在这里工作。",
+        "options": [
+            "He works here since 2015.",
+            "He is working here since 2015.",
+            "He has worked here since 2015.",
+            "He has been work here since 2015."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "We are having dinner right now.",
+        "note": "dùng hiện tại đơn thay cho hành động ngay lúc nói.",
+        "translation": "我们现在正在吃晚饭。",
+        "options": [
+            "We have dinner right now.",
+            "We are having dinner right now.",
+            "We have had dinner right now.",
+            "We have been have dinner right now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She often goes jogging before work.",
+        "note": "dùng tiếp diễn cho thói quen.",
+        "translation": "她经常在上班前慢跑。",
+        "options": [
+            "She is often going jogging before work.",
+            "She often goes jogging before work.",
+            "She has often gone jogging before work.",
+            "She has been often going jogging before work."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have been waiting for you for an hour.",
+        "note": "phân biệt hoàn thành và hoàn thành tiếp diễn cho hành động kéo dài.",
+        "translation": "我已经等你一个小时了。",
+        "options": [
+            "I wait for you for an hour.",
+            "I am waiting for you for an hour.",
+            "I have waited for you for an hour.",
+            "I have been waiting for you for an hour."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The teacher is explaining the lesson.",
+        "note": "dùng hiện tại đơn cho hành động diễn ra ngay lúc nói.",
+        "translation": "老师正在讲解这课。",
+        "options": [
+            "The teacher explains the lesson now.",
+            "The teacher is explaining the lesson.",
+            "The teacher has explained the lesson now.",
+            "The teacher has been explaining the lesson now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has just left the office.",
+        "note": "dùng sai thì cho tình huống “vừa mới”.",
+        "translation": "他刚离开办公室。",
+        "options": [
+            "He just leaves the office.",
+            "He is just leaving the office.",
+            "He has just left the office.",
+            "He has been just leaving the office."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "Are they coming to the meeting today?",
+        "note": "dùng hiện tại đơn cho kế hoạch đã sắp xếp.",
+        "translation": "他们今天要来开会吗？",
+        "options": [
+            "Do they come to the meeting today?",
+            "Are they coming to the meeting today?",
+            "Have they come to the meeting today?",
+            "Have they been coming to the meeting today?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My parents live in the countryside.",
+        "note": "dùng tiếp diễn cho sự thật lâu dài.",
+        "translation": "我父母住在乡下。",
+        "options": [
+            "My parents are living in the countryside (as a permanent fact).",
+            "My parents live in the countryside.",
+            "My parents have lived in the countryside now.",
+            "My parents have been living in the countryside now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is improving her English very quickly.",
+        "note": "sai dùng thì khi nói về sự thay đổi tiến bộ.",
+        "translation": "她的英语进步得很快。",
+        "options": [
+            "She improves her English very quickly (right now).",
+            "She is improving her English very quickly.",
+            "She has improved her English very quickly (habit).",
+            "She has been improve her English very quickly."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have known him for a long time.",
+        "note": "chia tiếp diễn cho động từ trạng thái.",
+        "translation": "我认识他很久了。",
+        "options": [
+            "I know him for a long time.",
+            "I am knowing him for a long time.",
+            "I have known him for a long time.",
+            "I have been knowing him for a long time."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "It is getting colder and colder.",
+        "note": "dùng hiện tại đơn thay cho sự thay đổi có xu hướng.",
+        "translation": "天气越来越冷。",
+        "options": [
+            "It gets colder and colder.",
+            "It is getting colder and colder.",
+            "It has got colder and colder.",
+            "It has been get colder and colder."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They have bought a new house.",
+        "note": "nhầm giữa hành động hoàn thành và hành động đang diễn ra.",
+        "translation": "他们买了一栋新房子。",
+        "options": [
+            "They buy a new house.",
+            "They are buying a new house (completed action).",
+            "They have bought a new house.",
+            "They have been buy a new house."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am thinking about changing my job.",
+        "note": "nhầm giữa “think = believe” (không dùng tiếp diễn) và “think = consider” (dùng tiếp diễn).",
+        "translation": "我正在考虑换工作。",
+        "options": [
+            "I think about changing my job.",
+            "I am thinking about changing my job.",
+            "I have thought about changing my job now.",
+            "I have been think about changing my job."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has already started her project.",
+        "note": "sai cách dùng already với thì hoàn thành.",
+        "translation": "她已经开始她的项目了。",
+        "options": [
+            "She already starts her project.",
+            "She is already starting her project.",
+            "She has already started her project.",
+            "She has been already start her project."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The baby is sleeping now.",
+        "note": "dùng hiện tại đơn cho hành động đang diễn ra.",
+        "translation": "宝宝现在正在睡觉。",
+        "options": [
+            "The baby sleeps now.",
+            "The baby is sleeping now.",
+            "The baby has slept now.",
+            "The baby has been sleeping now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has written three emails today.",
+        "note": "dùng hiện tại đơn cho thời gian chưa kết thúc (today).",
+        "translation": "他今天写了三封邮件。",
+        "options": [
+            "He writes three emails today.",
+            "He is writing three emails today.",
+            "He has written three emails today.",
+            "He has been write three emails today."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is looking after her sister this week.",
+        "note": "dùng hiện tại đơn cho tình huống tạm thời.",
+        "translation": "她这周在照顾她妹妹。",
+        "options": [
+            "She looks after her sister this week.",
+            "She is looking after her sister this week.",
+            "She has looked after her sister this week.",
+            "She has been look after her sister this week."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have been feeling much better lately.",
+        "note": "nhầm giữa tiếp diễn hoàn thành và các thì khác cho tình trạng thay đổi gần đây.",
+        "translation": "我最近感觉好多了。",
+        "options": [
+            "I feel much better lately.",
+            "I am feeling much better lately.",
+            "I have felt much better lately.",
+            "I have been feeling much better lately."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The sun rises in the east.",
+        "note": "dùng thì khác cho chân lý hiển nhiên.",
+        "translation": "太阳从东方升起。",
+        "options": [
+            "The sun is rising in the east.",
+            "The sun rises in the east.",
+            "The sun has risen in the east.",
+            "The sun is going to rise in the east."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is constantly forgetting her keys.",
+        "note": "hiểu sai “always/constantly + V-ing” diễn tả sự khó chịu.",
+        "translation": "她老是忘记带钥匙。",
+        "options": [
+            "She constantly forgets her keys.",
+            "She is constantly forgetting her keys.",
+            "She has constantly forgotten her keys.",
+            "She constantly is forgetting her keys."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have never tried sushi before.",
+        "note": "nhầm kinh nghiệm (present perfect) với quá khứ đơn.",
+        "translation": "我以前从未尝过寿司。",
+        "options": [
+            "I never try sushi before.",
+            "I never tried sushi before.",
+            "I have never tried sushi before.",
+            "I have never been trying sushi before."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They are building a new bridge now.",
+        "note": "dùng sai thì cho hành động đang diễn ra.",
+        "translation": "他们正在建一座新桥。",
+        "options": [
+            "They build a new bridge now.",
+            "They are building a new bridge now.",
+            "They have built a new bridge now.",
+            "They have been building a new bridge now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have lived here for ten years.",
+        "note": "dùng sai since/for với thì hoàn thành.",
+        "translation": "我在这里住了十年了。",
+        "options": [
+            "I live here for ten years.",
+            "I am living here for ten years.",
+            "I have lived here for ten years.",
+            "I have been living here ten years."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is staying with a friend this week.",
+        "note": "không nhận ra tình huống tạm thời → hiện tại tiếp diễn.",
+        "translation": "这个星期她暂时住在朋友家。",
+        "options": [
+            "She stays with a friend this week.",
+            "She is staying with a friend this week.",
+            "She has stayed with a friend this week.",
+            "She stays with a friend every week."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have been studying English all morning.",
+        "note": "nhầm kéo dài liên tục → present perfect continuous.",
+        "translation": "我整个上午都在学习英语。",
+        "options": [
+            "I studied English all morning.",
+            "I am studying English all morning.",
+            "I have studied English all morning.",
+            "I have been studying English all morning."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He rarely eats fast food.",
+        "note": "vị trí trạng từ tần suất và thì sai.",
+        "translation": "他很少吃快餐。",
+        "options": [
+            "He is rarely eating fast food.",
+            "He rarely eats fast food.",
+            "He has rarely eaten fast food.",
+            "He is eating rarely fast food."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The climate is getting warmer.",
+        "note": "dùng sai thì cho sự thay đổi dần dần.",
+        "translation": "气候正在变得越来越暖。",
+        "options": [
+            "The climate gets warmer.",
+            "The climate is getting warmer.",
+            "The climate has gotten warmer.",
+            "The climate has been getting warmer."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "Someone is knocking on the door.",
+        "note": "không dùng hiện tại tiếp diễn cho hành động ngay lúc nói.",
+        "translation": "有人在敲门。",
+        "options": [
+            "Someone knocks on the door.",
+            "Someone is knocking on the door.",
+            "Someone has knocked on the door.",
+            "Someone has been knocking on the door."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has just finished her homework.",
+        "note": "sai vị trí just và thì sai.",
+        "translation": "她刚刚完成作业。",
+        "options": [
+            "She just finishes her homework.",
+            "She just finished her homework.",
+            "She has just finished her homework.",
+            "She has been just finishing her homework."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He is working late this month.",
+        "note": "nhầm lịch trình tạm thời với trạng thái dài hạn.",
+        "translation": "这个月他常常加班到很晚。",
+        "options": [
+            "He works late this month.",
+            "He is working late this month.",
+            "He has worked late this month.",
+            "He has been working late late this month."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "Water boils at 100 degrees Celsius.",
+        "note": "dùng thì khác cho định luật tự nhiên.",
+        "translation": "水在100摄氏度沸腾。",
+        "options": [
+            "Water is boiling at 100 degrees Celsius.",
+            "Water boils at 100 degrees Celsius.",
+            "Water has boiled at 100 degrees Celsius.",
+            "Water will boil at 100 degrees Celsius."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am trying to lose weight these days.",
+        "note": "dùng hiện tại đơn thay vì tiếp diễn cho hành động tạm thời.",
+        "translation": "这几天我正在努力减肥。",
+        "options": [
+            "I try to lose weight these days.",
+            "I am trying to lose weight these days.",
+            "I have tried to lose weight these days.",
+            "I have been trying lose weight these days."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "We have already eaten dinner.",
+        "note": "nhầm already dùng với quá khứ đơn.",
+        "translation": "我们已经吃过晚饭了。",
+        "options": [
+            "We already eat dinner.",
+            "We already ate dinner.",
+            "We have already eaten dinner.",
+            "We have been already eating dinner."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is always complaining about her job.",
+        "note": "hiểu sai sắc thái “always + V-ing”.",
+        "translation": "她总是在抱怨她的工作。",
+        "options": [
+            "She always complains about her job.",
+            "She is always complaining about her job.",
+            "She always is complaining about her job.",
+            "She has always complained about her job."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have known him since primary school.",
+        "note": "dùng sai với state verbs.",
+        "translation": "我从小学起就认识他。",
+        "options": [
+            "I am knowing him since primary school.",
+            "I know him since primary school.",
+            "I have known him since primary school.",
+            "I have been knowing him since primary school."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is getting better at playing the piano.",
+        "note": "nhầm mô tả sự cải thiện liên tục.",
+        "translation": "她的钢琴弹得越来越好。",
+        "options": [
+            "She gets better at playing the piano.",
+            "She is getting better at playing the piano.",
+            "She has gotten better at playing the piano.",
+            "She has been getting better at playing the piano."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They have been arguing for an hour.",
+        "note": "phân biệt present perfect và present perfect continuous.",
+        "translation": "他们已经吵了一个小时了。",
+        "options": [
+            "They argue for an hour.",
+            "They are arguing for an hour.",
+            "They have argued for an hour.",
+            "They have been arguing for an hour."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The child is sleeping now.",
+        "note": "không dùng hiện tại đơn với now.",
+        "translation": "孩子现在正在睡觉。",
+        "options": [
+            "The child sleeps now.",
+            "The child is sleeping now.",
+            "The child has slept now.",
+            "The child has been sleeping now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have just seen your message.",
+        "note": "nhầm quá khứ đơn với vừa mới xảy ra.",
+        "translation": "我刚看到你的消息。",
+        "options": [
+            "I just see your message.",
+            "I just saw your message.",
+            "I have just seen your message.",
+            "I have been just seeing your message."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She doesn’t usually drink coffee at night.",
+        "note": "sai cấu trúc phủ định ở hiện tại đơn.",
+        "translation": "她晚上通常不喝咖啡。",
+        "options": [
+            "She isn’t usually drinking coffee at night.",
+            "She doesn’t usually drink coffee at night.",
+            "She hasn’t usually drunk coffee at night.",
+            "She usually doesn’t drinking coffee at night."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am looking for my keys right now.",
+        "note": "nhầm thì cho hành động tức thời.",
+        "translation": "我现在正在找我的钥匙。",
+        "options": [
+            "I look for my keys right now.",
+            "I am looking for my keys right now.",
+            "I have looked for my keys right now.",
+            "I have been looking for my keys right now."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has worked here since 2015.",
+        "note": "thiếu giới từ và dùng sai thì với since.",
+        "translation": "他从2015年起就在这里工作。",
+        "options": [
+            "He works here since 2015.",
+            "He is working here since 2015.",
+            "He has worked here since 2015.",
+            "He has been working here 2015."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am not feeling well today.",
+        "note": "dùng hiện tại đơn thay vì tiếp diễn với trạng thái tạm thời.",
+        "translation": "我今天感觉不太舒服。",
+        "options": [
+            "I do not feel well today.",
+            "I am not feeling well today.",
+            "I have not felt well today.",
+            "I have not been feeling well today."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He usually takes the bus to work.",
+        "note": "dùng hiện tại tiếp diễn cho thói quen.",
+        "translation": "他通常坐公交车上班。",
+        "options": [
+            "He is usually taking the bus to work.",
+            "He usually takes the bus to work.",
+            "He has usually taken the bus to work.",
+            "He usually is taking the bus to work."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have lost my wallet.",
+        "note": "nhầm quá khứ đơn và present perfect nói về kết quả hiện tại.",
+        "translation": "我把钱包弄丢了。",
+        "options": [
+            "I lose my wallet.",
+            "I lost my wallet.",
+            "I have lost my wallet.",
+            "I have been losing my wallet."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is preparing dinner at the moment.",
+        "note": "dùng sai thì cho hành động ngay lúc nói.",
+        "translation": "她现在正在准备晚餐。",
+        "options": [
+            "She prepares dinner at the moment.",
+            "She is preparing dinner at the moment.",
+            "She has prepared dinner at the moment.",
+            "She has been preparing dinner at the moment."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They have just arrived home.",
+        "note": "nhầm quá khứ đơn với hành động vừa mới xảy ra.",
+        "translation": "他们刚到家。",
+        "options": [
+            "They just arrive home.",
+            "They just arrived home.",
+            "They have just arrived home.",
+            "They have been just arriving home."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The Earth orbits the sun.",
+        "note": "dùng thì khác cho chân lý khoa học.",
+        "translation": "地球绕着太阳运行。",
+        "options": [
+            "The Earth is orbiting the sun.",
+            "The Earth orbits the sun.",
+            "The Earth has orbited the sun.",
+            "The Earth has been orbiting the sun."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am getting tired of this noise.",
+        "note": "không dùng hiện tại tiếp diễn để diễn tả thay đổi.",
+        "translation": "我越来越受不了这种噪音了。",
+        "options": [
+            "I get tired of this noise.",
+            "I am getting tired of this noise.",
+            "I have gotten tired of this noise.",
+            "I have been getting tired of this noise."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has lived in Tokyo all her life.",
+        "note": "hiểu sai phạm vi thời gian kéo dài đến hiện tại.",
+        "translation": "她一生都住在东京。",
+        "options": [
+            "She lives in Tokyo all her life.",
+            "She is living in Tokyo all her life.",
+            "She has lived in Tokyo all her life.",
+            "She has been living in Tokyo all her life."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I rarely watch TV on weekdays.",
+        "note": "dùng sai thì với trạng từ tần suất.",
+        "translation": "我平日很少看电视。",
+        "options": [
+            "I am rarely watching TV on weekdays.",
+            "I rarely watch TV on weekdays.",
+            "I have rarely watched TV on weekdays.",
+            "I rarely am watching TV on weekdays."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has been waiting for you for half an hour.",
+        "note": "nhầm giữa present perfect và present perfect continuous.",
+        "translation": "他已经等你半个小时了。",
+        "options": [
+            "He waits for you for half an hour.",
+            "He is waiting for you for half an hour.",
+            "He has waited for you for half an hour.",
+            "He has been waiting for you for half an hour."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She doesn’t like spicy food.",
+        "note": "dùng sai thì cho state verbs.",
+        "translation": "她不喜欢辣的食物。",
+        "options": [
+            "She isn’t liking spicy food.",
+            "She doesn’t like spicy food.",
+            "She hasn’t liked spicy food.",
+            "She doesn’t liking spicy food."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am working on a new project this month.",
+        "note": "không nhận ra tình huống tạm thời.",
+        "translation": "这个月我正在做一个新项目。",
+        "options": [
+            "I work on a new project this month.",
+            "I am working on a new project this month.",
+            "I have worked on a new project this month.",
+            "I have been working on a new project this month."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The train leaves at 8 a.m. tomorrow.",
+        "note": "không dùng hiện tại đơn cho lịch trình cố định.",
+        "translation": "火车明天早上8点出发。",
+        "options": [
+            "The train is leaving at 8 a.m. tomorrow.",
+            "The train leaves at 8 a.m. tomorrow.",
+            "The train has left at 8 a.m. tomorrow.",
+            "The train will leave at 8 a.m. tomorrow."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have been feeling a bit stressed lately.",
+        "note": "dùng sai thì với lately.",
+        "translation": "我最近有点压力。",
+        "options": [
+            "I feel a bit stressed lately.",
+            "I am feeling a bit stressed lately.",
+            "I have felt a bit stressed lately.",
+            "I have been feeling a bit stressed lately."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She speaks French fluently.",
+        "note": "nhầm giữa khả năng và hành động đang diễn ra.",
+        "translation": "她法语说得很流利。",
+        "options": [
+            "She is speaking French fluently.",
+            "She speaks French fluently.",
+            "She has spoken French fluently.",
+            "She has been speaking French fluently."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have already done my homework.",
+        "note": "nhầm already + V2 với present perfect.",
+        "translation": "我已经做完作业了。",
+        "options": [
+            "I already do my homework.",
+            "I already did my homework.",
+            "I have already done my homework.",
+            "I already have been doing my homework."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He is getting more and more confident.",
+        "note": "không dùng hiện tại tiếp diễn cho thay đổi dần.",
+        "translation": "他越来越自信了。",
+        "options": [
+            "He gets more and more confident.",
+            "He is getting more and more confident.",
+            "He has gotten more and more confident.",
+            "He has been getting more and more confident."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I don’t understand this sentence.",
+        "note": "state verbs không dùng tiếp diễn.",
+        "translation": "我不理解这个句子。",
+        "options": [
+            "I am not understanding this sentence.",
+            "I don’t understand this sentence.",
+            "I haven’t understood this sentence.",
+            "I haven’t been understanding this sentence."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has worked very hard this week.",
+        "note": "hiểu sai thời gian chưa kết thúc.",
+        "translation": "她这周工作得很努力。",
+        "options": [
+            "She works very hard this week.",
+            "She is working very hard this week.",
+            "She has worked very hard this week.",
+            "She has been work very hard this week."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am reading a great book these days.",
+        "note": "dùng hiện tại đơn thay vì tiếp diễn cho hành động tạm thời.",
+        "translation": "这几天我在读一本很棒的书。",
+        "options": [
+            "I read a great book these days.",
+            "I am reading a great book these days.",
+            "I have read a great book these days.",
+            "I have been reading a great book these days."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has just left the office.",
+        "note": "nhầm thì cho hành động vừa mới xảy ra.",
+        "translation": "她刚离开办公室。",
+        "options": [
+            "She just leaves the office.",
+            "She just left the office.",
+            "She has just left the office.",
+            "She has been just leaving the office."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My parents usually get up early.",
+        "note": "sai thì của thói quen.",
+        "translation": "我父母通常很早起床。",
+        "options": [
+            "My parents are usually getting up early.",
+            "My parents usually get up early.",
+            "My parents have usually gotten up early.",
+            "My parents are getting usually up early."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is working as a designer this year.",
+        "note": "không phân biệt trạng thái tạm thời và dài hạn.",
+        "translation": "今年她在做设计师的工作。",
+        "options": [
+            "She works as a designer this year.",
+            "She is working as a designer this year.",
+            "She has worked as a designer this year.",
+            "She has been working as a designer this year."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I haven’t seen him recently.",
+        "note": "dùng sai thì với recently.",
+        "translation": "我最近没见到他。",
+        "options": [
+            "I don’t see him recently.",
+            "I didn’t see him recently.",
+            "I haven’t seen him recently.",
+            "I haven’t been seen him recently."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The weather is becoming cooler.",
+        "note": "không dùng hiện tại tiếp diễn cho sự thay đổi.",
+        "translation": "天气正在变凉。",
+        "options": [
+            "The weather becomes cooler.",
+            "The weather is becoming cooler.",
+            "The weather has become cooler.",
+            "The weather has been becoming cooler."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has studied English since she was a child.",
+        "note": "dùng sai thì với since.",
+        "translation": "她从小就学习英语。",
+        "options": [
+            "She studies English since she was a child.",
+            "She is studying English since she was a child.",
+            "She has studied English since she was a child.",
+            "She has been studied English since she was a child."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I usually check my email before breakfast.",
+        "note": "nhầm chia động từ với chủ ngữ số ít và số nhiều.",
+        "translation": "我通常在早餐前检查电子邮件。",
+        "options": [
+            "I usually checks my email before breakfast.",
+            "I usually check my email before breakfast.",
+            "I am usually checking my email before breakfast.",
+            "I have usually checked my email before breakfast."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My parents prefer tea to coffee.",
+        "note": "sai chia động từ cho chủ ngữ số nhiều.",
+        "translation": "我父母喜欢茶胜过咖啡。",
+        "options": [
+            "My parents prefers tea to coffee.",
+            "My parents prefer tea to coffee.",
+            "My parents are preferring tea to coffee.",
+            "My parents have preferred tea to coffee."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He teaches physics at a local high school.",
+        "note": "nhầm hiện tại đơn và tiếp diễn cho nghề nghiệp lâu dài.",
+        "translation": "他在本地高中教物理。",
+        "options": [
+            "He teach physics at a local high school.",
+            "He teaches physics at a local high school.",
+            "He is teaching physics at a local high school.",
+            "He has taught physics at a local high school."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The library opens at 8 a.m. every weekday.",
+        "note": "nhầm chia động từ cho lịch trình cố định.",
+        "translation": "图书馆每个工作日早上8点开门。",
+        "options": [
+            "The library open at 8 a.m. every weekday.",
+            "The library opens at 8 a.m. every weekday.",
+            "The library is opening at 8 a.m. every weekday.",
+            "The library has opened at 8 a.m. every weekday."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "Water boils at 100 degrees Celsius.",
+        "note": "nhầm giữa chân lý khoa học và hành động đang diễn ra.",
+        "translation": "水在100摄氏度沸腾。",
+        "options": [
+            "Water boil at 100 degrees Celsius.",
+            "Water boils at 100 degrees Celsius.",
+            "Water is boiling at 100 degrees Celsius.",
+            "Water has boiled at 100 degrees Celsius."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She rarely forgets people’s birthdays.",
+        "note": "nhầm thì với trạng từ tần suất.",
+        "translation": "她很少忘记别人的生日。",
+        "options": [
+            "She is rarely forgetting people’s birthdays.",
+            "She rarely forgets people’s birthdays.",
+            "She has rarely forgotten people’s birthdays.",
+            "She rarely forget people’s birthdays."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "This pen belongs to me.",
+        "note": "dùng sai thì với động từ trạng thái.",
+        "translation": "这支笔属于我。",
+        "options": [
+            "This pen belong to me.",
+            "This pen belongs to me.",
+            "This pen is belonging to me.",
+            "This pen has belonged to me."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They need more time to finish the report.",
+        "note": "sai chia động từ cho chủ ngữ số nhiều; không dùng tiếp diễn với động từ nhận thức.",
+        "translation": "他们需要更多时间完成报告。",
+        "options": [
+            "They needs more time to finish the report.",
+            "They need more time to finish the report.",
+            "They are needing more time to finish the report.",
+            "They have needed more time to finish the report."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The museum closes on Mondays.",
+        "note": "nhầm chia động từ cho lịch trình cố định.",
+        "translation": "博物馆星期一关门。",
+        "options": [
+            "The museum close on Mondays.",
+            "The museum closes on Mondays.",
+            "The museum is closing on Mondays.",
+            "The museum has closed on Mondays."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My grandmother tells me stories about her childhood.",
+        "note": "nhầm hiện tại đơn và tiếp diễn cho thói quen.",
+        "translation": "我的奶奶给我讲她童年的故事。",
+        "options": [
+            "My grandmother tell me stories about her childhood.",
+            "My grandmother tells me stories about her childhood.",
+            "My grandmother is telling me stories about her childhood.",
+            "My grandmother has told me stories about her childhood."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He drives to work, but he takes the bus home.",
+        "note": "nhầm chia động từ cho thói quen hàng ngày.",
+        "translation": "他开车上班，但回家坐公交车。",
+        "options": [
+            "He drive to work, but he takes the bus home.",
+            "He drives to work, but he takes the bus home.",
+            "He is driving to work, but he is taking the bus home.",
+            "He has driven to work, but he has taken the bus home."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She always adds sugar to her tea.",
+        "note": "nhầm chia động từ và dùng sai thì khi có “always” + hành vi lặp đi lặp lại.",
+        "translation": "她总是在茶里加糖。",
+        "options": [
+            "She always add sugar to her tea.",
+            "She always adds sugar to her tea.",
+            "She is always adding sugar to her tea.",
+            "She has always added sugar to her tea."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "Our school offers many after-school activities.",
+        "note": "nhầm chia động từ cho chủ ngữ số ít.",
+        "translation": "我们学校提供许多课后活动。",
+        "options": [
+            "Our school offer many after-school activities.",
+            "Our school offers many after-school activities.",
+            "Our school is offering many after-school activities.",
+            "Our school has offered many after-school activities."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I never eat junk food on weekdays.",
+        "note": "nhầm chia động từ với chủ ngữ số ít và số nhiều.",
+        "translation": "我平日从不吃垃圾食品。",
+        "options": [
+            "I am never eating junk food on weekdays.",
+            "I never eats junk food on weekdays.",
+            "I never eat junk food on weekdays.",
+            "I have never eaten junk food on weekdays."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The Earth orbits the Sun.",
+        "note": "nhầm chân lý khoa học với hành động đang diễn ra.",
+        "translation": "地球绕太阳转。",
+        "options": [
+            "The Earth orbit the Sun.",
+            "The Earth orbits the Sun.",
+            "The Earth is orbiting the Sun.",
+            "The Earth has orbited the Sun."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The train arrives at platform 3.",
+        "note": "nhầm chia động từ cho lịch trình cố định.",
+        "translation": "火车到3号站台。",
+        "options": [
+            "The train arrive at platform 3.",
+            "The train arrives at platform 3.",
+            "The train is arriving at platform 3.",
+            "The train has arrived at platform 3."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She writes for a local newspaper.",
+        "note": "nhầm hiện tại đơn và tiếp diễn cho nghề nghiệp lâu dài.",
+        "translation": "她为本地报纸写稿。",
+        "options": [
+            "She write for a local newspaper.",
+            "She writes for a local newspaper.",
+            "She is writing for a local newspaper.",
+            "She has written for a local newspaper."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My brother fixes computers for a living.",
+        "note": "nhầm chia động từ cho nghề nghiệp thường xuyên.",
+        "translation": "我的哥哥以修电脑为生。",
+        "options": [
+            "My brother fix computers for a living.",
+            "My brother fixes computers for a living.",
+            "My brother is fixing computers for a living.",
+            "My brother has fixed computers for a living."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "This website provides useful study materials.",
+        "note": "nhầm chia động từ cho chủ ngữ số ít.",
+        "translation": "这个网站提供有用的学习资料。",
+        "options": [
+            "This website provide useful study materials.",
+            "This website provides useful study materials.",
+            "This website is providing useful study materials.",
+            "This website has provided useful study materials."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He usually wears black to work.",
+        "note": "nhầm chia động từ với chủ ngữ số ít.",
+        "translation": "他通常穿黑色衣服去上班。",
+        "options": [
+            "He usually wear black to work.",
+            "He usually wears black to work.",
+            "He is usually wearing black to work.",
+            "He has usually worn black to work."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The shop sells homemade bread.",
+        "note": "nhầm chia động từ cho hành động thường xuyên.",
+        "translation": "这家商店卖自制面包。",
+        "options": [
+            "The shop sell homemade bread.",
+            "The shop sells homemade bread.",
+            "The shop is selling homemade bread.",
+            "The shop has sold homemade bread."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I remember his phone number very clearly.",
+        "note": "nhầm chia động từ với chủ ngữ số ít và số nhiều; dùng tiếp diễn với động từ trạng thái.",
+        "translation": "我非常清楚地记得他的电话号码。",
+        "options": [
+            "I remembers his phone number very clearly.",
+            "I remember his phone number very clearly.",
+            "I am remembering his phone number very clearly.",
+            "I have remembered his phone number very clearly."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The hotel offers free breakfast.",
+        "note": "nhầm chia động từ cho chủ ngữ số ít.",
+        "translation": "这家酒店提供免费早餐。",
+        "options": [
+            "The hotel offer free breakfast.",
+            "The hotel offers free breakfast.",
+            "The hotel is offering free breakfast.",
+            "The hotel has offered free breakfast."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She studies Japanese every evening.",
+        "note": "nhầm hiện tại đơn và tiếp diễn cho thói quen.",
+        "translation": "她每晚学习日语。",
+        "options": [
+            "She study Japanese every evening.",
+            "She studies Japanese every evening.",
+            "She is studying Japanese every evening.",
+            "She has studied Japanese every evening."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My friends always support me when I need help.",
+        "note": "nhầm chia động từ với chủ ngữ số nhiều; dùng sai “always” với present continuous.",
+        "translation": "当我需要帮助时，我的朋友们总是支持我。",
+        "options": [
+            "My friends always supports me when I need help.",
+            "My friends always support me when I need help.",
+            "My friends are always supporting me when I need help.",
+            "My friends have always supported me when I need help."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has lived in Tokyo all her life.",
+        "note": "nhầm present perfect với hiện tại đơn và hiện tại tiếp diễn cho hành động kéo dài.",
+        "translation": "她一生都住在东京。",
+        "options": [
+            "She lives in Tokyo all her life.",
+            "She is living in Tokyo all her life.",
+            "She has lived in Tokyo all her life.",
+            "She has been living in Tokyo all her life."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I rarely watch TV on weekdays.",
+        "note": "dùng sai thì với trạng từ tần suất.",
+        "translation": "我平日很少看电视。",
+        "options": [
+            "I am rarely watching TV on weekdays.",
+            "I rarely watch TV on weekdays.",
+            "I have rarely watched TV on weekdays.",
+            "I rarely am watching TV on weekdays."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He has been waiting for you for half an hour.",
+        "note": "nhầm giữa present perfect và present perfect continuous.",
+        "translation": "他已经等你半个小时了。",
+        "options": [
+            "He waits for you for half an hour.",
+            "He is waiting for you for half an hour.",
+            "He has waited for you for half an hour.",
+            "He has been waiting for you for half an hour."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She doesn’t like spicy food.",
+        "note": "dùng sai thì cho state verbs.",
+        "translation": "她不喜欢辣的食物。",
+        "options": [
+            "She isn’t liking spicy food.",
+            "She doesn’t like spicy food.",
+            "She hasn’t liked spicy food.",
+            "She doesn’t liking spicy food."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am working on a new project this month.",
+        "note": "không phân biệt hành động tạm thời với lâu dài.",
+        "translation": "这个月我正在做一个新项目。",
+        "options": [
+            "I work on a new project this month.",
+            "I am working on a new project this month.",
+            "I have worked on a new project this month.",
+            "I have been working on a new project this month."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The train leaves at 8 a.m. tomorrow.",
+        "note": "không dùng hiện tại đơn cho lịch trình cố định.",
+        "translation": "火车明天早上8点出发。",
+        "options": [
+            "The train is leaving at 8 a.m. tomorrow.",
+            "The train leaves at 8 a.m. tomorrow.",
+            "The train has left at 8 a.m. tomorrow.",
+            "The train will leave at 8 a.m. tomorrow."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have been feeling a bit stressed lately.",
+        "note": "dùng sai thì với lately.",
+        "translation": "我最近有点压力。",
+        "options": [
+            "I feel a bit stressed lately.",
+            "I am feeling a bit stressed lately.",
+            "I have felt a bit stressed lately.",
+            "I have been feeling a bit stressed lately."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She speaks French fluently.",
+        "note": "nhầm giữa khả năng và hành động đang diễn ra.",
+        "translation": "她法语说得很流利。",
+        "options": [
+            "She is speaking French fluently.",
+            "She speaks French fluently.",
+            "She has spoken French fluently.",
+            "She has been speaking French fluently."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have already done my homework.",
+        "note": "nhầm already + V2 với present perfect.",
+        "translation": "我已经做完作业了。",
+        "options": [
+            "I already do my homework.",
+            "I already did my homework.",
+            "I have already done my homework.",
+            "I already have been doing my homework."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He is getting more and more confident.",
+        "note": "không dùng hiện tại tiếp diễn cho thay đổi dần.",
+        "translation": "他越来越自信了。",
+        "options": [
+            "He gets more and more confident.",
+            "He is getting more and more confident.",
+            "He has gotten more and more confident.",
+            "He has been getting more and more confident."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I don’t understand this sentence.",
+        "note": "state verbs không dùng tiếp diễn.",
+        "translation": "我不理解这个句子。",
+        "options": [
+            "I am not understanding this sentence.",
+            "I don’t understand this sentence.",
+            "I haven’t understood this sentence.",
+            "I haven’t been understanding this sentence."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has worked very hard this week.",
+        "note": "hiểu sai thời gian chưa kết thúc.",
+        "translation": "她这周工作得很努力。",
+        "options": [
+            "She works very hard this week.",
+            "She is working very hard this week.",
+            "She has worked very hard this week.",
+            "She has been work very hard this week."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am reading a great book these days.",
+        "note": "dùng hiện tại đơn thay vì tiếp diễn cho hành động tạm thời.",
+        "translation": "这几天我在读一本很棒的书。",
+        "options": [
+            "I read a great book these days.",
+            "I am reading a great book these days.",
+            "I have read a great book these days.",
+            "I have been reading a great book these days."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has just left the office.",
+        "note": "nhầm thì cho hành động vừa mới xảy ra.",
+        "translation": "她刚离开办公室。",
+        "options": [
+            "She just leaves the office.",
+            "She just left the office.",
+            "She has just left the office.",
+            "She has been just leaving the office."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "My parents usually get up early.",
+        "note": "sai thì của thói quen.",
+        "translation": "我父母通常很早起床。",
+        "options": [
+            "My parents are usually getting up early.",
+            "My parents usually get up early.",
+            "My parents have usually gotten up early.",
+            "My parents are getting usually up early."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is working as a designer this year.",
+        "note": "không phân biệt trạng thái tạm thời và lâu dài.",
+        "translation": "今年她在做设计师的工作。",
+        "options": [
+            "She works as a designer this year.",
+            "She is working as a designer this year.",
+            "She has worked as a designer this year.",
+            "She has been working as a designer this year."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I haven’t seen him recently.",
+        "note": "dùng sai thì với recently.",
+        "translation": "我最近没见到他。",
+        "options": [
+            "I don’t see him recently.",
+            "I didn’t see him recently.",
+            "I haven’t seen him recently.",
+            "I haven’t been seen him recently."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The weather is becoming cooler.",
+        "note": "không dùng hiện tại tiếp diễn cho sự thay đổi.",
+        "translation": "天气正在变凉。",
+        "options": [
+            "The weather becomes cooler.",
+            "The weather is becoming cooler.",
+            "The weather has become cooler.",
+            "The weather has been becoming cooler."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She has studied English since she was a child.",
+        "note": "dùng sai thì với since.",
+        "translation": "她从小就学习英语。",
+        "options": [
+            "She studies English since she was a child.",
+            "She is studying English since she was a child.",
+            "She has studied English since she was a child.",
+            "She has been studied English since she was a child."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "He usually takes the bus to work.",
+        "note": "dùng hiện tại tiếp diễn cho thói quen.",
+        "translation": "他通常坐公交车上班。",
+        "options": [
+            "He is usually taking the bus to work.",
+            "He usually takes the bus to work.",
+            "He has usually taken the bus to work.",
+            "He usually is taking the bus to work."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I have lost my wallet.",
+        "note": "nhầm quá khứ đơn và present perfect nói về kết quả hiện tại.",
+        "translation": "我把钱包弄丢了。",
+        "options": [
+            "I lose my wallet.",
+            "I lost my wallet.",
+            "I have lost my wallet.",
+            "I have been losing my wallet."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "She is preparing dinner at the moment.",
+        "note": "dùng sai thì cho hành động ngay lúc nói.",
+        "translation": "她现在正在准备晚餐。",
+        "options": [
+            "She prepares dinner at the moment.",
+            "She is preparing dinner at the moment.",
+            "She has prepared dinner at the moment.",
+            "She has been preparing dinner at the moment."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "They have just arrived home.",
+        "note": "nhầm quá khứ đơn với hành động vừa mới xảy ra.",
+        "translation": "他们刚到家。",
+        "options": [
+            "They just arrive home.",
+            "They just arrived home.",
+            "They have just arrived home.",
+            "They have been just arriving home."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "The Earth orbits the sun.",
+        "note": "dùng thì khác cho chân lý khoa học.",
+        "translation": "地球绕着太阳运行。",
+        "options": [
+            "The Earth is orbiting the sun.",
+            "The Earth orbits the sun.",
+            "The Earth has orbited the sun.",
+            "The Earth has been orbiting the sun."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.003528,
+        "end": 0.065464,
+        "correctAnswer": "I am getting tired of this noise.",
+        "note": "không dùng hiện tại tiếp diễn để diễn tả thay đổi.",
+        "translation": "我越来越受不了这种噪音了。",
+        "options": [
+            "I get tired of this noise.",
+            "I am getting tired of this noise.",
+            "I have gotten tired of this noise.",
+            "I have been getting tired of this noise."
+        ]
+    }
+];
+
+        let currentIndex = 0;
+        let isFreeMode = true;
+        let correctCount = 0;
+        let isPlaying = false;
+        let correctSentences = new Set();
+        let wrongSentences = new Set();
+        let autoContinue = false;
+        let showAnswer = false;
+        let userAnswers = [];
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function init() {
+            updateSentenceDisplay();
+        }
+
+        function updateSentenceDisplay() {
+            sentenceNumber.value = currentIndex + 1;
+            indicator.style.background = '#ffffe0';
+            noteDisplay.style.display = 'none';
+            
+            if (isFreeMode && showAnswer) {
+                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #2f2f2f;">${sentences[currentIndex].translation}</div>
+                `;
+            } else {
+                indicator.innerHTML = '';
+            }
+            updateOptions();
+            if (!isFreeMode) updateScore();
+        }
+
+        function updateOptions() {
+            optionsContainer.innerHTML = '';
+            const shuffledOptions = shuffleArray(sentences[currentIndex].options);
+            shuffledOptions.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'optionBtn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function playCurrentSentence() {
+            if (isPlaying) audio.pause();
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            sentenceNumber.disabled = true;
+            isPlaying = true;
+            audio.src = sentences[currentIndex].audioFile;
+            audio.currentTime = sentences[currentIndex].start;
+            audio.play().catch(error => {
+                console.error('Audio playback failed:', error);
+                alert('Vui lòng nhấn nút "再听一遍" để phát âm thanh.');
+                buttons.forEach(btn => btn.classList.remove('disabled'));
+                sentenceNumber.disabled = false;
+                isPlaying = false;
+            });
+
+            audio.ontimeupdate = () => {
+                if (audio.currentTime >= sentences[currentIndex].end) {
+                    audio.pause();
+                    audio.ontimeupdate = null;
+                    buttons.forEach(btn => btn.classList.remove('disabled'));
+                    sentenceNumber.disabled = false;
+                    isPlaying = false;
+                }
+            };
+        }
+
+        function moveSentence(direction) {
+            currentIndex = (currentIndex + direction + sentences.length) % sentences.length;
+            updateSentenceDisplay();
+            playCurrentSentence();
+        }
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = sentences[currentIndex].correctAnswer;
+            const optionButtons = optionsContainer.getElementsByClassName('optionBtn');
+            
+            // Ẩn note display trước khi kiểm tra câu trả lời mới
+            noteDisplay.style.display = 'none';
+            noteDisplay.textContent = '';
+            
+            // Clear previous styles
+            for (let btn of optionButtons) {
+                btn.classList.remove('correct', 'wrong');
+                btn.disabled = !isFreeMode;
+            }
+
+            // Find and style the selected button
+            for (let btn of optionButtons) {
+                if (btn.textContent === selectedAnswer) {
+                    if (selectedAnswer === correctAnswer) {
+                        indicator.style.background = '#B7D7AA';
+                        indicator.innerHTML = `
+                            <div style="font-size: 18px; font-weight: bold; color: #000000;">${sentences[currentIndex].translation}</div>
+                        `;
+                        btn.classList.add('correct');
+                        correctAudio.play().catch(error => {
+                            console.error('Correct audio playback failed:', error);
+                        });
+                    } else {
+                        indicator.style.background = '#CE6D5E';
+                        indicator.innerHTML = `
+                            <div style="font-size: 18px; font-weight: bold; color: #000000;">${sentences[currentIndex].translation}</div>
+                        `;
+                        btn.classList.add('wrong');
+                        
+                        // Hiển thị note khi trả lời sai
+                        if (sentences[currentIndex].note) {
+                            noteDisplay.textContent = ` ${sentences[currentIndex].note}`;
+                            noteDisplay.style.display = 'block';
+                        }
+                        
+                        wrongAudio.play().catch(error => {
+                            console.error('Wrong audio playback failed:', error);
+                        });
+                    }
+                }
+            }
+
+            if (!isFreeMode) {
+                userAnswers[currentIndex] = selectedAnswer;
+                if (selectedAnswer === correctAnswer && !correctSentences.has(currentIndex)) {
+                    correctCount++;
+                    correctSentences.add(currentIndex);
+                    wrongSentences.delete(currentIndex);
+                } else if (selectedAnswer !== correctAnswer && !correctSentences.has(currentIndex)) {
+                    wrongSentences.add(currentIndex);
+                }
+                updateScore();
+
+                // Auto-move to next sentence in Test Mode
+                const audioToWait = (selectedAnswer === correctAnswer) ? correctAudio : wrongAudio;
+                audioToWait.onended = () => {
+                    if (userAnswers.length === sentences.length) {
+                        showResults();
+                    } else {
+                        setTimeout(() => {
+                            moveSentence(1);
+                        }, 200);
+                    }
+                };
+            } else if (isFreeMode && autoContinue && selectedAnswer === correctAnswer) {
+                // Auto-move in Free Mode only if answer is correct and autoContinue is enabled
+                correctAudio.onended = () => {
+                    setTimeout(() => {
+                        moveSentence(1);
+                    }, 200);
+                };
+            } else {
+                correctAudio.onended = null;
+                wrongAudio.onended = null;
+            }
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `${correctCount}/${sentences.length}`;
+            scoreDisplay.style.display = 'block';
+        }
+
+        function showResults() {
+            let resultText = `练习完成！\n正确答案数量：${correctCount}/${sentences.length}\n正确率：${((correctCount / sentences.length) * 100).toFixed(2)}%\n错误题目：`;
+            wrongSentences.forEach(index => {
+                resultText += `\n第${index + 1}题：\n你的选择：${userAnswers[index] || '未选择'}\n正确答案：${sentences[index].correctAnswer}\n`;
+                if (sentences[index].note) {
+                    resultText += `注释：${sentences[index].note}\n`;
+                }
+            });
+            if (wrongSentences.size === 0) {
+                resultText += '\n全部正确！';
+            }
+            resultsDisplay.textContent = resultText;
+            resultsDisplay.style.display = 'block';
+        }
+
+        prevBtn.onclick = () => {
+            moveSentence(-1);
+        };
+
+        nextBtn.onclick = () => {
+            moveSentence(1);
+        };
+
+        replayBtn.onclick = () => {
+            playCurrentSentence();
+        };
+
+        freeModeBtn.onclick = () => {
+            isFreeMode = true;
+            freeModeBtn.classList.add('active-mode');
+            testModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = false;
+            autoContinueBtn.classList.remove('disabled');
+            showHideBtn.disabled = false;
+            showHideBtn.classList.remove('disabled');
+            scoreDisplay.style.display = 'none';
+            wrongSentencesDisplay.style.display = 'none';
+            resultsDisplay.style.display = 'none';
+            noteDisplay.style.display = 'none';
+            updateSentenceDisplay();
+        };
+
+        testModeBtn.onclick = () => {
+            isFreeMode = false;
+            testModeBtn.classList.add('active-mode');
+            freeModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = true;
+            autoContinueBtn.classList.add('disabled');
+            showHideBtn.disabled = true;
+            showHideBtn.classList.add('disabled');
+            showHideBtn.classList.remove('active-mode');
+            showAnswer = false;
+            scoreDisplay.style.display = 'block';
+            noteDisplay.style.display = 'none';
+            currentIndex = 0;
+            correctCount = 0;
+            correctSentences.clear();
+            wrongSentences.clear();
+            userAnswers = [];
+            for (let i = 0; i < sentences.length; i++) {
+                wrongSentences.add(i);
+            }
+            updateSentenceDisplay();
+        };
+
+        autoContinueBtn.onclick = () => {
+            if (isFreeMode) {
+                autoContinue = !autoContinue;
+                autoContinueBtn.classList.toggle('active-mode');
+                if (!autoContinue) {
+                    correctAudio.onended = null;
+                }
+            }
+        };
+
+        showHideBtn.onclick = () => {
+            if (isFreeMode) {
+                showAnswer = !showAnswer;
+                showHideBtn.classList.toggle('active-mode');
+                updateSentenceDisplay();
+            }
+        };
+
+        sentenceNumber.onchange = () => {
+            if (!isPlaying) {
+                const num = parseInt(sentenceNumber.value) - 1;
+                if (!isNaN(num) && num >= 0 && num < sentences.length) {
+                    currentIndex = num;
+                    updateSentenceDisplay();
+                    playCurrentSentence();
+                } else {
+                    alert(`输入范围： 1 到 ${sentences.length}`);
+                    updateSentenceDisplay();
+                }
+            }
+        };
+
+        sentenceNumber.onkeydown = (e) => {
+            if (!isPlaying) {
+                if (e.key === 'ArrowLeft') {
+                    moveSentence(-1);
+                }
+                if (e.key === 'ArrowRight') {
+                    moveSentence(1);
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
